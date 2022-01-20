@@ -22,7 +22,7 @@ import time
 import os
 import signal
 import traceback
-sys.path.append('./SDP_Pi_HM3301/aqi')
+sys.path.append('./SDL_Pi_HM3301/aqi')
 import aqi
 
 import MySQLdb as mdb
@@ -42,13 +42,13 @@ def nowStr():
 
 #stripped = lambda s: "".join(i for i in s if 31 < ord(i) < 127)
 
-
 #   We're using a queue to capture output as it occurs
 try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
 ON_POSIX = 'posix' in sys.builtin_module_names
+
 
 def enqueue_output(src, out, queue):
     try:
@@ -74,9 +74,7 @@ def mqtt_publish_single(message, topic):
         print('Mosquitto not available')
 
 
-
 # process functions
-
 def processFT020T(sLine, lastFT020TTimeStamp ):
 
     if (config.SWDEBUG):
@@ -98,12 +96,10 @@ def processFT020T(sLine, lastFT020TTimeStamp ):
 
     # now check for adding record
 
-
     # outside temperature and Humidity
 
     state.mainID = var["id"] 
     state.lastMainReading = nowStr()
-
 
     if (state.previousMainReading == "Never"):
         pclogging.systemlog(config.INFO,"Main Weather Sensors Found")
@@ -111,12 +107,9 @@ def processFT020T(sLine, lastFT020TTimeStamp ):
         pclogging.systemlog(config.INFO,"Blynk Updates Started")
         state.previousMainReading = state.lastMainReading
 
-
-
     wTemp = var["temperature"]
 
     ucHumi = var["humidity"]
-
 
     wTemp = (wTemp - 400)/10.0
     # deal with error condtions
@@ -136,46 +129,42 @@ def processFT020T(sLine, lastFT020TTimeStamp ):
     state.OutdoorTemperature = round(((wTemp - 32.0)/(9.0/5.0)),2)
     state.OutdoorHumidity =  ucHumi 
 
-    
-        
-    state.WindSpeed =  round(var["avewindspeed"]/10.0, 1)
-    state.WindGust  = round(var["gustwindspeed"]/10.0, 1)
-    state.WindDirection  = var["winddirection"]
-    
+    state.WindSpeed = round(var["avewindspeed"]/10.0, 1)
+    state.WindGust = round(var["gustwindspeed"]/10.0, 1)
+    state.WindDirection = var["winddirection"]
 
-
-    state.TotalRain  = round(var["cumulativerain"]/10.0,1)
+    state.TotalRain = round(var["cumulativerain"]/10.0,1)
 
     wLight = var["light"]
-    if (wLight >= 0x1fffa):
+    if wLight >= 0x1fffa:
         wLight = wLight | 0x7fff0000
 
     wUVI =var["uv"]
-    if (wUVI >= 0xfa):
+    if wUVI >= 0xfa:
         wUVI = wUVI | 0x7f00
 
     state.SunlightVisible =  wLight 
     state.SunlightUVIndex  = round(wUVI/10.0, 1 )
 
-    if (var['batterylow'] == 0):
+    if var['batterylow'] == 0:
         state.BatteryOK = "OK"
     else:
         state.BatteryOK = "LOW"
 
-    #print("looking for buildJSONSemaphore acquire")
+    # print("looking for buildJSONSemaphore acquire")
     state.buildJSONSemaphore.acquire()
-    #print("buildJSONSemaphore acquired")
+    # print("buildJSONSemaphore acquired")
     state.StateJSON = buildJSON.getStateJSON()
-    #if (config.SWDEBUG):
+    # if config.SWDEBUG:
     #    print("currentJSON = ", state.StateJSON)
     state.buildJSONSemaphore.release()
-    #print("buildJSONSemaphore released")
+    # print("buildJSONSemaphore released")
     return lastFT020TTimeStamp
 
 
 # processes Inside Temperature and Humidity
 def processF016TH(sLine):
-    if (config.SWDEBUG):
+    if config.SWDEBUG:
         sys.stdout.write('Processing F016TH data'+'\n')
         sys.stdout.write('This is the raw data: ' + sLine + '\n')
     
@@ -193,12 +182,10 @@ def processF016TH(sLine):
     state.mainID = var["device"] + var["channel"]
     state.lastIndoorReading = nowStr()
 
-    if (config.MQTT_Enable == True):
+    if config.MQTT_Enable == True:
          mqtt_publish_single(sLine, f"F016TH/{var['channel']}")
 
-
-
-    if (state.previousIndoorReading == "Never"):
+    if state.previousIndoorReading == "Never":
         pclogging.systemlog(config.INFO,"Indoor Weather Sensor Found")
         print("Indoor Weather Sensors Found")
         state.previousIndoorReading = state.lastIndoorReading
@@ -208,29 +195,23 @@ def processF016TH(sLine):
     state.lastIndoorReading = var["time"]
     state.insideID = var["channel"]
 
-
-
     indoorTH.addITReading(var["device"], var["channel"], state.IndoorTemperature, var["humidity"], var["battery"],  var["time"])
 
-    #print("looking for buildJSONSemaphore acquire")
+    # print("looking for buildJSONSemaphore acquire")
     state.buildJSONSemaphore.acquire()
-    #print("buildJSONSemaphore acquired")
+    # print("buildJSONSemaphore acquired")
     state.StateJSON = buildJSON.getStateJSON()
-    #if (config.SWDEBUG):
+    # if (config.SWDEBUG):
     #   print("currentJSON = ", state.StateJSON)
     #   pass
     state.buildJSONSemaphore.release()
-    #print("buildJSONSemaphore released")
-
-
-
-
+    # print("buildJSONSemaphore released")
 
 # processes Generic Packets 
 def processWeatherSenseGeneric(sLine):
-    if (config.MQTT_Enable == True):
+    if config.MQTT_Enable == True:
         mqtt_publish_single(sLine, "Generic")
-    if (config.SWDEBUG):
+    if config.SWDEBUG:
         sys.stdout.write('Processing Generic data'+'\n')
         sys.stdout.write('This is the raw data: ' + sLine + '\n')
 
@@ -351,7 +332,6 @@ def processWeatherSenseAQI(sLine):
             else:
                 AQI24Hour = 0.0
 
-
             # HOTFIX for AQI problem from the wireless AQI sensor
             # recalculate AQI from RAW values and write in database
 
@@ -423,7 +403,6 @@ def WSread_AQI():
             print("Error %d: %s" % (e.args[0], e.args[1]))
             # sys.exit(1)
 
-
     return
 
 
@@ -489,8 +468,6 @@ def processSolarMAX(sLine):
                 state.SolarMaxInsideHumidity = float(myState["internalhumidity"]) 
                 state.SolarMAXLastReceived = myState["time"] 
 
-
-
             except mdb.Error as e:
                 traceback.print_exc()
                 print("Error %d: %s" % (e.args[0], e.args[1]))
@@ -519,7 +496,6 @@ def processWeatherSenseAfterShock(sLine):
 
     if (config.MQTT_Enable == True):
         mqtt_publish_single(sLine, "WSAfterShock")
-
 
     if (config.enable_MySQL_Logging == True):
         # open mysql database
@@ -571,11 +547,8 @@ def processWeatherSenseAfterShock(sLine):
     return
 
 
-
-
 # main read 433HMz Sensor Loop
 def readSensors():
-
 
     print("")
     print("######")
@@ -602,7 +575,7 @@ def readSensors():
 
     while True:
         #   Other processing can occur here as needed...
-        #sys.stdout.write('Made it to processing step. \n')
+        # sys.stdout.write('Made it to processing step. \n')
         timeSinceLastSample = time.time() - lastTimeSensorReceived
        
         if (timeSinceLastSample > 720.0):   # restart if no reads in 12 minutes
@@ -617,7 +590,6 @@ def readSensors():
             pclogging.systemlog(config.INFO,"SDR Restarted")
             if (config.SWDEBUG):
                 print("starting SDR Thread again")
-
                 print("")
                 print("######")
                 print("Read Wireless Sensors")
@@ -630,10 +602,9 @@ def readSensors():
             t.daemon = True # thread dies with the program
             t.start()
 
-
         try:
-            src, line = q.get(timeout = 1)
-            #print(line.decode())
+            src, line = q.get(timeout=1)
+            # print(line.decode())
         except Empty:
             pulse += 1
         else: # got line
@@ -643,11 +614,11 @@ def readSensors():
     
             #   See if the data is something we need to act on...
 
-            if ( sLine.find('F007TH') != -1) or ( sLine.find('FT0300') != -1) or ( sLine.find('F016TH') != -1) or ( sLine.find('FT020T') != -1):
+            if (sLine.find('F007TH') != -1) or (sLine.find('FT0300') != -1) or (sLine.find('F016TH') != -1) or (sLine.find('FT020T') != -1):
                 
-                if (( sLine.find('F007TH') != -1) or ( sLine.find('F016TH') != -1)): 
+                if ((sLine.find('F007TH') != -1) or (sLine.find('F016TH') != -1)):
                     processF016TH(sLine)
-                if (( sLine.find('FT0300') != -1) or ( sLine.find('FT020T') != -1)): 
+                if ((sLine.find('FT0300') != -1) or (sLine.find('FT020T') != -1)):
                     lastFT020TTimeStamp = processFT020T(sLine, lastFT020TTimeStamp)
             if (sLine.find('SolarMAX') != -1):
                 processSolarMAX(sLine)
@@ -663,7 +634,6 @@ def readSensors():
 
             if (sLine.find('AfterShock') != -1):
                 processWeatherSenseAfterShock(sLine)
-
 
         sys.stdout.flush()
 

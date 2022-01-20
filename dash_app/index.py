@@ -42,14 +42,13 @@ SGSDASHSOFTWAREVERSION = "006"
 
 STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
-print (STATIC_PATH)
-
+print(STATIC_PATH)
 
 newValveState = ""
 # state of previous page
 previousPathname = ""
 
-app = dash.Dash(__name__,external_stylesheets=[dbc.themes.SLATE])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE])
 
 #print("new navbar=")
 nav = Navbar()
@@ -57,37 +56,34 @@ logo = Logo(app)
 
 app.config.suppress_callback_exceptions = True
 
-app.layout =  html.Div(
+app.layout = html.Div(
 
         [
-
-       html.Div(id='my-output-interval'),
-
-       dcc.Interval(
+         html.Div(id='my-output-interval'),
+         dcc.Interval(
             id='main-interval-component',
-            interval=10*1000, # in milliseconds - leave as 10 seconds
+            interval=10*1000,  # in milliseconds - leave as 10 seconds
             n_intervals=0
-            ) ,
+            ),
 
-        dcc.Interval(
+         dcc.Interval(
             id='minute-interval-component',
             interval=60 * 1000,  # in milliseconds
             n_intervals=0
-        ),
+         ),
 
-
-       #dcc.Interval(
-       #     id='weather-update-interval-component',
-       #     interval=5*1000, # in milliseconds
-       #     n_intervals=0
-       #     ) ,
+         # dcc.Interval(
+         #     id='weather-update-interval-component',
+         #     interval=5*1000, # in milliseconds
+         #     n_intervals=0
+         #     ) ,
        
-        #dbc.Spinner(id="main-spinner", color="white" ),
-        #dcc.Location(id = 'url', refresh = True),
-        dcc.Location(id = 'url', refresh = False),
+         # dbc.Spinner(id="main-spinner", color="white" ),
+         # dcc.Location(id = 'url', refresh = True),
+         dcc.Location(id='url', refresh=False),
 
-        html.Div(id = 'page-content'),
-        #html.Div(id = 'wp-placeholder', style={'display':'none'}) 
+         html.Div(id='page-content'),
+         # html.Div(id = 'wp-placeholder', style={'display':'none'})
         ],
 
         id="mainpage"
@@ -110,14 +106,12 @@ def add_header(r):
 
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
-
-
 def display_page(pathname):
     global previousPathname
 
     #print("--------------------->>>>>>>>>>>>>>>>new page")
     now = datetime.datetime.now()
-    nowString =  now.strftime('%Y-%m-%d %H:%M:%S')
+    nowString = now.strftime('%Y-%m-%d %H:%M:%S')
     #print("begin=",nowString)
     
     #print("pathname=", pathname)
@@ -128,12 +122,12 @@ def display_page(pathname):
     if (i[0] == '.'):
         #print("---no page change--- ['.']")
         raise PreventUpdate	
-    #if (pathname == previousPathname):
+    # if (pathname == previousPathname):
     #    print("---no page change---Equal Pathname")
     #    raise PreventUpdate	
     previousPathname = pathname
     
-    #myLayout = NotImplPage()
+    # myLayout = NotImplPage()
     myLayout = status_page.StatusPage() 
     myLayout2 = ""
     if pathname == '/status_page':
@@ -170,7 +164,8 @@ def display_page(pathname):
     now = datetime.datetime.now()
     nowString =  now.strftime('%Y-%m-%d %H:%M:%S')
     #print("end=",nowString)
-    return (logo, nav,myLayout, myLayout2 )
+    return logo, nav, myLayout, myLayout2
+
 
 ##################
 # Log Page 
@@ -180,23 +175,20 @@ def display_page(pathname):
                   Input({'type' : 'LOGPdynamic', 'index' : MATCH}, 'id' )],
               [State({'type' : 'LOGPdynamic', 'index' : MATCH}, 'value'  )]
               )
-
 def logpageupdate(n_intervals, id, value):
     
-   #if (True): # 1 minutes -10 second timer
-   if ((n_intervals % (1*6)) == 0): # 1 minutes -10 second timer
-    #print ("---->inputs:",dash.callback_context.inputs) 
-    #print(">log_page table Update started",id['index'])
-    #print("LG-n_intervals=", n_intervals) 
-    if (id['index'] == "systemlog"):
-        data = log_page.fetchSystemLog()
-        fig = log_page.buildTableFig(data,"System Log")
- 
-
-        #print("<log_page table Update complete",id['index'])
-        return fig
-   else:
-    raise PreventUpdate
+   # if (True): # 1 minutes -10 second timer
+    if (n_intervals % (1 * 6)) == 0:  # 1 minutes -10 second timer
+       # print ("---->inputs:",dash.callback_context.inputs)
+       # print(">log_page table Update started",id['index'])
+       # print("LG-n_intervals=", n_intervals)
+        if id['index'] == "systemlog":
+            data = log_page.fetchSystemLog()
+            fig = log_page.buildTableFig(data, "System Log")
+            # print("<log_page table Update complete",id['index'])
+            return fig
+    else:
+        raise PreventUpdate
 
 ##################
 # Status Page
@@ -220,7 +212,6 @@ def update_indicators(n_intervals, id, color):
               Input({'type' : 'SPGdynamic', 'GaugeType' : MATCH}, 'id' )],
               [State({'type' : 'SPGdynamic', 'GaugeType' : MATCH}, 'value'  )]
               )
-
 def update_gauges(n_intervals, id, value):
    if (True): # 1 minutes -10 second timer
    #if ((n_intervals % (1*6)) == 0): # 1 minutes -10 second timer
@@ -247,7 +238,6 @@ def update_gauges(n_intervals, id, value):
               Input({'type' : 'SPdynamic', 'index' : MATCH }, 'id' )],
               [State({'type' : 'SPdynamic', 'index' : MATCH}, 'color'  )]
               )
-
 def update_indicators(n_intervals, id, color):
 
    #if ((n_intervals % (1*5)) == 0): # 15 minutes -10 second timer
@@ -278,7 +268,6 @@ def update_indicators(n_intervals, id, color):
               Input({'type' : 'WPIdynamic', 'index' : 'SkyCamImage'}, 'id' )],
               [State({'type' : 'WPIdynamic', 'index' : 'SkyCamImage'}, 'value'  )]
               )
-
 def updateWeatherImagePage(n_intervals,id, value):
     #print("+++++++++++++updateWImageP n_intervals", n_intervals)
     #print("+++++++++++++updateWImageP (n_intervals %6)", n_intervals% 6)

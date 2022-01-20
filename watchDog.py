@@ -1,17 +1,14 @@
 from __future__ import print_function
 # WatchDog Programs
-
 # Check for user imports
 import config
-
 import RPi.GPIO as GPIO
 import time
 
 GPIO.setwarnings(False)
 
+
 def patTheDog():
-
-
 	# pat the dog
         if (config.SWDEBUG):
             print("------Patting The Dog------- ")
