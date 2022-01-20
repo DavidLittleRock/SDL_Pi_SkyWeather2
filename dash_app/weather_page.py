@@ -617,7 +617,7 @@ def buildOutdoorTemperature_Humidity_Graph_Figure():
     fig.add_trace(
             go.Scatter(x=Time, y=Temperature, name="Temperature",
                        line=dict(
-                               color='red',
+                               color='black',
                                width=2,
                        ),
                        ),
@@ -627,7 +627,7 @@ def buildOutdoorTemperature_Humidity_Graph_Figure():
     fig.add_trace(
             go.Scatter(x=Time, y=Humidity, name="Humidity",
                        line=dict(
-                               color='blue',
+                               color='orange',
                                width=2,
                        ),
                        ),
@@ -644,6 +644,7 @@ def buildOutdoorTemperature_Humidity_Graph_Figure():
 
     minTemp = min(Temperature) * 0.9
     maxTemp = max(Temperature) * 1.10
+    maxTemp = 110
     # Set y-axes titles
     fig.update_yaxes(title_text="<b>Temperature (" + units + ")</b>",
                      range=(minTemp, maxTemp), secondary_y=False, side='left')
