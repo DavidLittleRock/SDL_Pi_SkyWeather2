@@ -608,7 +608,8 @@ def create_db_connection():
 
     try:
         logger.debug("START create_db_connection to sql")
-        db_config = read_config()
+        # db_config = read_config()
+        db_config = 's'
         connection = mdb.connect(**db_config)
         if connection.open:
             logger.debug(f"db connect open; success with:\n\t{db_config}")
@@ -620,7 +621,7 @@ def create_db_connection():
 
 
 
-def run_query(plot_days: int = 30) -> DataFrame:
+def run_query(plot_days: int = 30):
     db_connection = create_db_connection()
 
     return
