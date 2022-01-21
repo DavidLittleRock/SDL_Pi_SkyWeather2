@@ -8,6 +8,8 @@ import dash_html_components as html
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
+import pandas as pd
+
 # imports
 sys.path.append("../")
 
@@ -20,6 +22,24 @@ readJSON.readJSON("../")
 
 import MySQLdb as mdb
 
+
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter('%(asctime)s - Level: %(levelname)s\n\t'
+                                  '- Message: %(message)s\n\t\t'
+                                  '- Module: %(module)s  - Function: '
+                                  '%(funcName)s - Line #: %(lineno)s\n\t'
+                                  '--logger name: %(name)s\n')
+log_file_handler = logging.FileHandler('logfile.log')
+log_file_handler.setFormatter(log_formatter)
+log_file_handler.setLevel(logging.ERROR)
+logger.addHandler(log_file_handler)
+log_stream_handler = logging.StreamHandler()
+log_stream_handler.setFormatter(log_formatter)
+log_stream_handler.setLevel(logging.DEBUG)
+logger.addHandler(log_stream_handler)
+# logging.basicConfig(level=logging.DEBUG)
 
 ################
 # Weather Status
@@ -515,7 +535,7 @@ df = [77.5, 72.5, 70.0, 45.0, 22.5, 42.5, 40.0, 62.5]
     fig.update_traces(
         text=['North', 'N-E', 'East', 'S-E', 'South', 'S-W', 'West', 'N-W'])
     fig.update_layout(
-            title='Wind Speed Distribution Past Week',
+            title='Wind Speed Distribution Past Day',
             # font_size=16,
             legend_font_size=16,
             # polar_radialaxis_ticksuffix='%',
@@ -539,7 +559,7 @@ def buildCompassRose():
     layout = []
     myLabelLayout = []
 
-    timeDelta = datetime.timedelta(days=7)
+    timeDelta = datetime.timedelta(days=1)
     data = fetchWindData(timeDelta)
     fig = figCompassRose(data)
     layout.append(dcc.Graph(id={"type": "WPRdynamic", "index": "compassrose"},
@@ -578,6 +598,32 @@ def fetchOTH(timeDelta):
         cur.close()
         con.close()
 
+
+
+
+
+
+def create_db_connection():
+    connection = None
+
+    try:
+        logger.debug("START create_db_connection to sql")
+        db_config = read_config()
+        connection = mdb.connect(**db_config)
+        if connection.open:
+            logger.debug(f"db connect open; success with:\n\t{db_config}")
+    except Exception as err:
+        logger.error(f"Error: {err}")
+        # send_email(f"Error: {err}")
+    return connection
+
+
+
+
+def run_query(plot_days: int = 30) -> DataFrame:
+    db_connection = create_db_connection()
+
+    return
 
 def buildOutdoorTemperature_Humidity_Graph_Figure():
     timeDelta = datetime.timedelta(days=7)

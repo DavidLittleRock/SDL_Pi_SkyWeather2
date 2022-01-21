@@ -44,6 +44,24 @@ import SkyCamRemote
 import PictureManagement
 import ProcessPicture
 
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter('%(asctime)s - Level: %(levelname)s\n\t'
+                                  '- Message: %(message)s\n\t\t'
+                                  '- Module: %(module)s  - Function: '
+                                  '%(funcName)s - Line #: %(lineno)s\n\t'
+                                  '--logger name: %(name)s\n')
+log_file_handler = logging.FileHandler('logfile.log')
+log_file_handler.setFormatter(log_formatter)
+log_file_handler.setLevel(logging.ERROR)
+logger.addHandler(log_file_handler)
+log_stream_handler = logging.StreamHandler()
+log_stream_handler.setFormatter(log_formatter)
+log_stream_handler.setLevel(logging.DEBUG)
+logger.addHandler(log_stream_handler)
+# logging.basicConfig(level=logging.DEBUG)
+
 # Scheduler Helpers
 
 # print out faults inside events
