@@ -555,7 +555,7 @@ df = [77.5, 72.5, 70.0, 45.0, 22.5, 42.5, 40.0, 62.5]
     return fig
 
 
-def buildCompassRose():
+def buildCompassRose():  # this is first build, updates are in index.py
     layout = []
     myLabelLayout = []
 
@@ -1135,7 +1135,7 @@ def WeatherPage():
                             ),
                                     width=3,
                             ),
-                            dbc.Col(html.Div(buildCompassRose())),
+                            dbc.Col(html.Div(buildCompassRose())),  # this call first graph
 
                         ],
                 ),
