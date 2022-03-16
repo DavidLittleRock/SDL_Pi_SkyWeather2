@@ -934,7 +934,7 @@ def buildSunlightUVIndexGraphFigure():
 
     # Set y-axes titles
     fig.update_yaxes(title_text="<b>Sunlight (Lux)</b>", secondary_y=False,
-                     range=(0, 10000))
+                     range=(0, 100000))
     fig.update_yaxes(title_text="<b>UV Index </b>", secondary_y=True,
                      range=(0, 10))
 
