@@ -67,8 +67,8 @@ logger.addHandler(log_stream_handler)
 # print out faults inside events
 def ap_my_listener(event):
     if event.exception:
-        print (event.exception)
-        print (event.traceback)
+        print(event.exception)
+        print(event.traceback)
 
 
 # helper functions

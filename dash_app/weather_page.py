@@ -492,6 +492,9 @@ df = [77.5, 72.5, 70.0, 45.0, 22.5, 42.5, 40.0, 62.5]
           color_discrete_sequence= px.colors.sequential.Plasma_r)
     '''
     # print("df =", df)
+
+    one_wind = (4, 45)
+
     fig = go.Figure(
     )
     fig.add_trace(go.Barpolar(
@@ -531,6 +534,14 @@ df = [77.5, 72.5, 70.0, 45.0, 22.5, 42.5, 40.0, 62.5]
                 1) + " " + WUnits(),
             marker_color='rgb(240,0,163)'
     ))
+
+    fig.add_trace(go.Barpolar(
+            r=one_wind,
+            name=returnNumberConverted(0.0) + '-' + returnNumberConverted(
+                    1) + " " + WUnits(),
+            marker_color='rgb(240,0,163)'
+    ))
+
 
     fig.update_traces(
         text=['North', 'N-E', 'East', 'S-E', 'South', 'S-W', 'West', 'N-W'])
